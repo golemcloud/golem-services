@@ -3,16 +3,16 @@ use std::env;
 use std::path::Path;
 use std::sync::Arc;
 
-use golem_common::model::{AccountId, TemplateId, WorkerId};
-use golem_common::proto::golem::workerexecutor::worker_executor_client::WorkerExecutorClient;
-use golem_common::proto::golem::workerexecutor::{
+use golem_api_grpc::proto::golem::worker::{
+    log_event, val, CallingConvention, LogEvent, StdOutLog, Val, ValList, ValRecord,
+};
+use golem_api_grpc::proto::golem::workerexecutor::worker_executor_client::WorkerExecutorClient;
+use golem_api_grpc::proto::golem::workerexecutor::{
     create_worker_response, get_invocation_key_response, invoke_and_await_worker_response,
     ConnectWorkerRequest, CreateWorkerRequest, GetInvocationKeyRequest,
     InvokeAndAwaitWorkerRequest,
 };
-use golem_common::proto::golem::{
-    log_event, val, CallingConvention, LogEvent, StdOutLog, Val, ValList, ValRecord,
-};
+use golem_common::model::{AccountId, TemplateId, WorkerId};
 use golem_worker_executor_base::services::golem_config::GolemConfig;
 use golem_worker_executor_oss::run;
 use golem_worker_executor_oss::services::config::AdditionalGolemConfig;

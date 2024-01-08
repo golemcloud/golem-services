@@ -21,12 +21,15 @@ use uuid::Uuid;
 
 use crate::newtype_uuid;
 
-newtype_uuid!(GrantId);
-newtype_uuid!(PlanId);
-newtype_uuid!(ProjectId);
-newtype_uuid!(ProjectPolicyId);
-newtype_uuid!(TemplateId);
-newtype_uuid!(TokenId);
+// newtype_uuid!(GrantId);
+// newtype_uuid!(PlanId);
+// newtype_uuid!(ProjectId);
+// newtype_uuid!(ProjectPolicyId);
+newtype_uuid!(
+    TemplateId,
+    golem_api_grpc::proto::golem::template::TemplateId
+);
+// newtype_uuid!(TokenId);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(transparent)]
@@ -137,14 +140,14 @@ impl WorkerId {
         format!("{}/{}", self.template_id, self.worker_name)
     }
 
-    pub fn into_proto(self) -> crate::proto::golem::WorkerId {
-        crate::proto::golem::WorkerId {
+    pub fn into_proto(self) -> golem_api_grpc::proto::golem::worker::WorkerId {
+        golem_api_grpc::proto::golem::worker::WorkerId {
             template_id: Some(self.template_id.into()),
             name: self.worker_name,
         }
     }
 
-    pub fn from_proto(proto: crate::proto::golem::WorkerId) -> Self {
+    pub fn from_proto(proto: golem_api_grpc::proto::golem::worker::WorkerId) -> Self {
         Self {
             template_id: proto.template_id.unwrap().try_into().unwrap(),
             worker_name: proto.name,
@@ -193,7 +196,7 @@ impl Display for WorkerId {
     }
 }
 
-impl From<WorkerId> for crate::proto::golem::WorkerId {
+impl From<WorkerId> for golem_api_grpc::proto::golem::worker::WorkerId {
     fn from(value: WorkerId) -> Self {
         Self {
             template_id: Some(value.template_id.into()),
@@ -202,10 +205,12 @@ impl From<WorkerId> for crate::proto::golem::WorkerId {
     }
 }
 
-impl TryFrom<crate::proto::golem::WorkerId> for WorkerId {
+impl TryFrom<golem_api_grpc::proto::golem::worker::WorkerId> for WorkerId {
     type Error = String;
 
-    fn try_from(value: crate::proto::golem::WorkerId) -> Result<Self, Self::Error> {
+    fn try_from(
+        value: golem_api_grpc::proto::golem::worker::WorkerId,
+    ) -> Result<Self, Self::Error> {
         Ok(Self {
             template_id: value.template_id.unwrap().try_into()?,
             worker_name: value.name,
@@ -236,7 +241,7 @@ impl PromiseId {
     }
 }
 
-impl From<PromiseId> for crate::proto::golem::PromiseId {
+impl From<PromiseId> for golem_api_grpc::proto::golem::worker::PromiseId {
     fn from(value: PromiseId) -> Self {
         Self {
             worker_id: Some(value.worker_id.into()),
@@ -245,10 +250,12 @@ impl From<PromiseId> for crate::proto::golem::PromiseId {
     }
 }
 
-impl TryFrom<crate::proto::golem::PromiseId> for PromiseId {
+impl TryFrom<golem_api_grpc::proto::golem::worker::PromiseId> for PromiseId {
     type Error = String;
 
-    fn try_from(value: crate::proto::golem::PromiseId) -> Result<Self, Self::Error> {
+    fn try_from(
+        value: golem_api_grpc::proto::golem::worker::PromiseId,
+    ) -> Result<Self, Self::Error> {
         Ok(Self {
             worker_id: value.worker_id.ok_or("Missing worker_id")?.try_into()?,
             oplog_idx: value.oplog_idx,
@@ -337,14 +344,14 @@ impl Display for ShardId {
     }
 }
 
-impl From<ShardId> for crate::proto::golem::ShardId {
-    fn from(value: ShardId) -> crate::proto::golem::ShardId {
-        crate::proto::golem::ShardId { value: value.value }
+impl From<ShardId> for golem_api_grpc::proto::golem::shardmanager::ShardId {
+    fn from(value: ShardId) -> golem_api_grpc::proto::golem::shardmanager::ShardId {
+        golem_api_grpc::proto::golem::shardmanager::ShardId { value: value.value }
     }
 }
 
-impl From<crate::proto::golem::ShardId> for ShardId {
-    fn from(proto: crate::proto::golem::ShardId) -> Self {
+impl From<golem_api_grpc::proto::golem::shardmanager::ShardId> for ShardId {
+    fn from(proto: golem_api_grpc::proto::golem::shardmanager::ShardId) -> Self {
         Self { value: proto.value }
     }
 }
@@ -410,13 +417,13 @@ impl InvocationKey {
     }
 }
 
-impl From<crate::proto::golem::InvocationKey> for InvocationKey {
-    fn from(proto: crate::proto::golem::InvocationKey) -> Self {
+impl From<golem_api_grpc::proto::golem::worker::InvocationKey> for InvocationKey {
+    fn from(proto: golem_api_grpc::proto::golem::worker::InvocationKey) -> Self {
         Self { value: proto.value }
     }
 }
 
-impl From<InvocationKey> for crate::proto::golem::InvocationKey {
+impl From<InvocationKey> for golem_api_grpc::proto::golem::worker::InvocationKey {
     fn from(value: InvocationKey) -> Self {
         Self { value: value.value }
     }
@@ -448,12 +455,16 @@ impl TryFrom<i32> for CallingConvention {
     }
 }
 
-impl From<crate::proto::golem::CallingConvention> for CallingConvention {
-    fn from(value: crate::proto::golem::CallingConvention) -> Self {
+impl From<golem_api_grpc::proto::golem::worker::CallingConvention> for CallingConvention {
+    fn from(value: golem_api_grpc::proto::golem::worker::CallingConvention) -> Self {
         match value {
-            crate::proto::golem::CallingConvention::Component => CallingConvention::Component,
-            crate::proto::golem::CallingConvention::Stdio => CallingConvention::Stdio,
-            crate::proto::golem::CallingConvention::StdioEventloop => {
+            golem_api_grpc::proto::golem::worker::CallingConvention::Component => {
+                CallingConvention::Component
+            }
+            golem_api_grpc::proto::golem::worker::CallingConvention::Stdio => {
+                CallingConvention::Stdio
+            }
+            golem_api_grpc::proto::golem::worker::CallingConvention::StdioEventloop => {
                 CallingConvention::StdioEventloop
             }
         }
@@ -531,16 +542,20 @@ pub enum WorkerStatus {
     Exited,
 }
 
-impl From<WorkerStatus> for crate::proto::golem::WorkerStatus {
+impl From<WorkerStatus> for golem_api_grpc::proto::golem::worker::WorkerStatus {
     fn from(value: WorkerStatus) -> Self {
         match value {
-            WorkerStatus::Running => crate::proto::golem::WorkerStatus::Running,
-            WorkerStatus::Idle => crate::proto::golem::WorkerStatus::Idle,
-            WorkerStatus::Suspended => crate::proto::golem::WorkerStatus::Suspended,
-            WorkerStatus::Interrupted => crate::proto::golem::WorkerStatus::Interrupted,
-            WorkerStatus::Retrying => crate::proto::golem::WorkerStatus::Retrying,
-            WorkerStatus::Failed => crate::proto::golem::WorkerStatus::Failed,
-            WorkerStatus::Exited => crate::proto::golem::WorkerStatus::Exited,
+            WorkerStatus::Running => golem_api_grpc::proto::golem::worker::WorkerStatus::Running,
+            WorkerStatus::Idle => golem_api_grpc::proto::golem::worker::WorkerStatus::Idle,
+            WorkerStatus::Suspended => {
+                golem_api_grpc::proto::golem::worker::WorkerStatus::Suspended
+            }
+            WorkerStatus::Interrupted => {
+                golem_api_grpc::proto::golem::worker::WorkerStatus::Interrupted
+            }
+            WorkerStatus::Retrying => golem_api_grpc::proto::golem::worker::WorkerStatus::Retrying,
+            WorkerStatus::Failed => golem_api_grpc::proto::golem::worker::WorkerStatus::Failed,
+            WorkerStatus::Exited => golem_api_grpc::proto::golem::worker::WorkerStatus::Exited,
         }
     }
 }
@@ -611,15 +626,15 @@ impl From<&str> for AccountId {
     }
 }
 
-impl From<crate::proto::golem::AccountId> for AccountId {
-    fn from(proto: crate::proto::golem::AccountId) -> Self {
+impl From<golem_api_grpc::proto::golem::common::AccountId> for AccountId {
+    fn from(proto: golem_api_grpc::proto::golem::common::AccountId) -> Self {
         Self { value: proto.name }
     }
 }
 
-impl From<AccountId> for crate::proto::golem::AccountId {
+impl From<AccountId> for golem_api_grpc::proto::golem::common::AccountId {
     fn from(value: AccountId) -> Self {
-        crate::proto::golem::AccountId { name: value.value }
+        golem_api_grpc::proto::golem::common::AccountId { name: value.value }
     }
 }
 
